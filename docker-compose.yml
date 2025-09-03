@@ -4,11 +4,9 @@ services:
     image: harperdb/harperdb
     container_name: harperdb
     restart: always
-    # environment:
-    #   - HDB_ADMIN_USERNAME=admin
-    #   - HDB_ADMIN_PASSWORD=password123
-    env_file:
-      .env
+    environment:
+      - HDB_ADMIN_USERNAME=admin
+      - HDB_ADMIN_PASSWORD=password123
     ports:
       - "9925:9925"
     volumes:

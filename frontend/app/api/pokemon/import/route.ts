@@ -12,12 +12,13 @@ export async function POST(req: Request) {
     const text = await file.text();
     // parse CSV with headers, e.g. name,imageUrl,type1,type2,isLegendary,speed
     const records = parse(text, { columns: true, skip_empty_lines: true });
+    console.log("Parsed CSV records:", records[0]);
 
     // Normalize rows:
     const normalized = records.map((r: any) => ({
       id: r.id ? String(r.id) : crypto.randomUUID(),
       name: r.name || "",
-      imageUrl: r.imageUrl || "",
+      imageUrl: r.image || "",
       type1: r.type1 || null,
       type2: r.type2 || null,
       isLegendary: r.isLegendary === "true" || r.isLegendary === "1" || r.isLegendary === true,
