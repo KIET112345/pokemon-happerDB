@@ -1,0 +1,30 @@
+version: "3.9"
+services:
+  harperdb:
+    image: harperdb/harperdb
+    container_name: harperdb
+    restart: always
+    # environment:
+    #   - HDB_ADMIN_USERNAME=admin
+    #   - HDB_ADMIN_PASSWORD=password123
+    env_file:
+      .env
+    ports:
+      - "9925:9925"
+    volumes:
+      - ./harperdb-data:/opt/harperdb/hdb
+
+  # frontend:
+  #   build: ./frontend
+  #   container_name: frontend
+  #   restart: always
+  #   environment:
+  #     - HARPERDB_URL=http://harperdb:9925
+  #     - HARPERDB_USER=admin
+  #     - HARPERDB_PASS=password123
+  #     - JWT_SECRET=supersecret
+  #     - NEXT_PUBLIC_API_URL=http://localhost:3000
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - harperdb
