@@ -1,28 +1,41 @@
-version: "3.9"
+version: "3.8"
+
 services:
   harperdb:
-    image: harperdb/harperdb
+    image: harperdb/harperdb:latest
     container_name: harperdb
-    restart: always
+    restart: unless-stopped
     environment:
-      - HDB_ADMIN_USERNAME=admin
-      - HDB_ADMIN_PASSWORD=password123
+      HDB_ADMIN_USERNAME: admin
+      HDB_ADMIN_PASSWORD: password123
     ports:
       - "9925:9925"
+      - "9926:9926"
     volumes:
-      - ./harperdb-data:/opt/harperdb/hdb
+      - ./harperdb-init:/opt/harperdb-init
 
-  # frontend:
-  #   build: ./frontend
-  #   container_name: frontend
-  #   restart: always
-  #   environment:
-  #     - HARPERDB_URL=http://harperdb:9925
-  #     - HARPERDB_USER=admin
-  #     - HARPERDB_PASS=password123
-  #     - JWT_SECRET=supersecret
-  #     - NEXT_PUBLIC_API_URL=http://localhost:3000
-  #   ports:
-  #     - "3000:3000"
-  #   depends_on:
-  #     - harperdb
+  harperdb-init:
+    image: node:22
+    depends_on:
+      - harperdb
+    volumes:
+      - ./harperdb-init:/opt/harperdb-init
+    working_dir: /opt/harperdb-init
+    command: sh -c "
+      echo 'Waiting for HarperDB...' &&
+      until curl -s -u admin:password123 http://harperdb:9925 > /dev/null; do sleep 2; done &&
+      node init-db.js"
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    restart: always
+    environment:
+      - HARPERDB_URL=http://harperdb:9925
+      - HARPERDB_USER=admin
+      - HARPERDB_PASS=password123
+      - JWT_SECRET=supersecret
+      - NEXT_PUBLIC_API_URL=http://localhost:3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - harperdb-init
